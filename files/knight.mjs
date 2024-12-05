@@ -1,27 +1,76 @@
+
 class Square {
-    constructor(location, neighbours = []) {
-        this.location = location;
-        this.neighbours = neighbours;
+    constructor() {
+        this.cord = null;
+        this.next = null;
     }
 }
 
-function knightMoves(initial, target) {
-    errorHandler(initial, target)
-
-    if (initial[0] === target[0] && initial[1] === target[1]) {
-        return declareMoves(initial, target);
+function knightMoves(cord, target, queueArray = [], generatedSquares= []) {
+    errorHandler(cord, target);
+    if (cord[0] === target[0] && cord[1] === target[1]) {
+        return declareMoves(queueArray[0], target);
     }
+    let current = queueArray[0];
+    queueArray.shift();
+    generatedSquares.push(cord);
+    let neighbours = [];
+    generateNeighbours(cord, neighbours);
+    addInQueue(cord, current, queueArray, neighbours, generatedSquares);
+    current = queueArray[0];
+    while (current.next !== null) {
+        current = current.next;
+    }
+    return knightMoves(current.cord, target, queueArray, generatedSquares);
+}
 
-    let newSquare = new Square(initial);
-    generateNeighbours(initial, newSquare);
-    let totalNeighbours = generateNeighbours.length;
-    for(let i = 0; i < totalNeighbours; i++) {
-        knightMoves(newSquare.neighbours[i], target);
+
+function addInQueue(cord, current, queueArray, neighbours, generatedSquares) {
+    let square = current;
+    if (queueArray.length === 0) {
+        neighbours.forEach(neighbor => {      
+            let initialSquare = new Square();
+            initialSquare.cord = cord;
+            let neighborSquare = new Square();
+            initialSquare.next = neighborSquare;
+            neighborSquare.cord = neighbor;
+            queueArray.push(initialSquare);
+        });
+    } else {
+        neighbours.forEach(neighbor => {
+            if (!checkInGenerated(generatedSquares, neighbor)) {
+                let initial = {...current};
+                let neighborSquare = new Square();
+                while (initial.next !== null) {
+                    initial = initial.next;
+                }
+                initial.next = neighborSquare;
+                neighborSquare.cord = neighbor
+                queueArray.push(square);
+            }        
+        })
     }
 }
 
-function declareMoves(initial, target) {
-    return `You made it in 2 moves! Here's your path: [${initial}] -> [${target}]`
+
+function checkInGenerated(array, value) {
+    if (array.some(e => e[0] === value[0] && e[1] === value[1])) {
+     return true;
+    }
+    return false;
+}
+
+function declareMoves(value, target) {
+    let countMoves = 0
+    let path = '';
+    while (value.next !== null) {
+        countMoves += 1;
+        path += `[${value.cord}] -> `
+        value = value.next
+    }
+    path += `[${value.cord}]`;
+    let msg = `You made it in ${countMoves}. Here is your path: ${path}`
+    return msg;
 }
 
 function errorHandler(initial, target) {
@@ -30,7 +79,7 @@ function errorHandler(initial, target) {
     }
 }
 
-function generateNeighbours(initial, square) {
+function generateNeighbours(initial, neighbours) {
 
     const max = 8;
     const min = -1;
@@ -45,7 +94,7 @@ function generateNeighbours(initial, square) {
                 y += 1;
                 let node = [x, y];
                 if (conditions(x, y, min, max)) {
-                    square.neighbours.push(node)
+                    neighbours.push(node)
                 }        
                 break; 
             }
@@ -56,7 +105,7 @@ function generateNeighbours(initial, square) {
                 y -= 1;
                 let node = [x, y];
                 if (conditions(x, y, min, max)) {
-                    square.neighbours.push(node)
+                    neighbours.push(node)
                 }        
                 break; 
             }
@@ -67,7 +116,7 @@ function generateNeighbours(initial, square) {
                 y += 1;
                 let node = [x, y];
                 if (conditions(x, y, min, max)) {
-                    square.neighbours.push(node)
+                    neighbours.push(node)
                 }        
                 break; 
             }
@@ -78,7 +127,7 @@ function generateNeighbours(initial, square) {
                 y -= 1;
                 let node = [x, y];
                 if (conditions(x, y, min, max)) {
-                    square.neighbours.push(node)
+                    neighbours.push(node)
                 }        
                 break; 
             }
@@ -89,7 +138,7 @@ function generateNeighbours(initial, square) {
                 y += 2;
                 let node = [x, y];
                 if (conditions(x, y, min, max)) {
-                    square.neighbours.push(node)
+                    neighbours.push(node)
                 }        
                 break; 
             }
@@ -100,7 +149,7 @@ function generateNeighbours(initial, square) {
                 y += 2;
                 let node = [x, y];
                 if (conditions(x, y, min, max)) {
-                    square.neighbours.push(node)
+                    neighbours.push(node)
                 }        
                 break; 
             }
@@ -111,7 +160,7 @@ function generateNeighbours(initial, square) {
                 y -= 2;
                 let node = [x, y];
                 if (conditions(x, y, min, max)) {
-                    square.neighbours.push(node)
+                    neighbours.push(node)
                 }        
                 break; 
             }
@@ -122,7 +171,7 @@ function generateNeighbours(initial, square) {
                 y -= 2;
                 let node = [x, y];
                 if (conditions(x, y, min, max)) {
-                    square.neighbours.push(node)
+                    neighbours.push(node)
                 }        
                 break; 
             }
@@ -141,4 +190,6 @@ function conditions(x, y, min, max) {
     }
 }
 
-knightMoves([1, 2], [1, 3])
+let k = knightMoves([0,0],[3, 3])
+
+console.log(k)
