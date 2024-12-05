@@ -1,11 +1,5 @@
-var value = 5;
-var arr = [];
-var i = 0;
-while (i < 5) {
-  let a = value
-  a += 1;
-  arr.push(a)
-  i++;
-}
+import { knightMoves } from "./knight.mjs";
 
-console.log(arr)
+let k = knightMoves([0, 0], [1, 1]);
+
+console.log(k);
